@@ -1,36 +1,108 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Background Remover Project
 
-## Getting Started
+This project consists of a FastAPI backend for removing backgrounds from images and a Next.js frontend for interacting with the backend service.
 
-First, run the development server:
+## Project Structure
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+background-remover/
+├── python/
+│   ├── main.py
+│   └── requirements.txt
+├── app/
+│   └── (Next.js frontend files)
+└── README.md
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Prerequisites
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Python 3.7+
+- Node.js 14+
+- npm or yarn
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Setup Instructions
 
-## Learn More
+### Backend (FastAPI)
 
-To learn more about Next.js, take a look at the following resources:
+1. Navigate to the `python` directory:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   ```
+   cd background-remover/python
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+2. Create a virtual environment:
 
-## Deploy on Vercel
+   ```
+   python -m venv venv
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. Activate the virtual environment:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+   - On Windows:
+     ```
+     venv\Scripts\activate
+     ```
+   - On macOS and Linux:
+     ```
+     source venv/bin/activate
+     ```
+
+4. Install the required Python packages:
+
+   ```
+   pip install -r requirements.txt
+   ```
+
+5. Run the FastAPI server:
+
+   ```
+   uvicorn main:app --reload
+   ```
+
+   The backend server should now be running at `http://localhost:8000`.
+
+### Frontend (Next.js)
+
+1. Navigate to the `app` directory:
+
+   ```
+   cd background-remover/app
+   ```
+
+2. Install the required npm packages:
+
+   ```
+   npm install
+   ```
+
+   or if you're using yarn:
+
+   ```
+   yarn install
+   ```
+
+3. Run the Next.js development server:
+
+   ```
+   npm run dev
+   ```
+
+   or with yarn:
+
+   ```
+   yarn dev
+   ```
+
+   The frontend should now be accessible at `http://localhost:3000`.
+
+## Usage
+
+1. Open your web browser and go to `http://localhost:3000`.
+2. Use the file input to select an image.
+3. Click the "Remove Background" button to process the image.
+4. The processed image with the background removed will be displayed on the page.
+
+## Troubleshooting
+
+- If you encounter CORS issues, ensure that your FastAPI backend is configured to allow requests from `http://localhost:3000`.
+- If the image processing fails, check the console logs in both the frontend and backend for error messages.
