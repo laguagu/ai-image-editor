@@ -1,4 +1,4 @@
-# Background Remover Project
+# Background Remover | FastAPI | Next.js
 
 This project consists of a FastAPI backend for removing backgrounds from images and a Next.js frontend for interacting with the backend service.
 
