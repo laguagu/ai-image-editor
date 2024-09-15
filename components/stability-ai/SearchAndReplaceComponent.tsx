@@ -46,7 +46,7 @@ const SearchAndReplaceComponent: React.FC = () => {
             "Content-Type": "multipart/form-data",
           },
           responseType: "arraybuffer",
-        }
+        },
       );
 
       if (response.status === 200) {
@@ -54,7 +54,7 @@ const SearchAndReplaceComponent: React.FC = () => {
         setResult(`data:image/${outputFormat};base64,${base64}`);
       } else {
         throw new Error(
-          `${response.status}: ${Buffer.from(response.data).toString()}`
+          `${response.status}: ${Buffer.from(response.data).toString()}`,
         );
       }
     } catch (error: any) {
@@ -66,7 +66,7 @@ const SearchAndReplaceComponent: React.FC = () => {
         console.error("Response status:", error.response.status);
         console.error("Response headers:", error.response.headers);
         setError(
-          `Error ${error.response.status}: ${Buffer.from(error.response.data).toString()}`
+          `Error ${error.response.status}: ${Buffer.from(error.response.data).toString()}`,
         );
       } else if (error.request) {
         // The request was made but no response was received

@@ -4,7 +4,7 @@ import React, { ChangeEvent, useState } from "react";
 
 const StabilityAITestComponent: React.FC = () => {
   const [prompt, setPrompt] = useState<string>(
-    "Lighthouse on a cliff overlooking the ocean"
+    "Lighthouse on a cliff overlooking the ocean",
   );
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +33,7 @@ const StabilityAITestComponent: React.FC = () => {
             Accept: "image/*",
           },
           responseType: "arraybuffer",
-        }
+        },
       );
 
       const base64 = Buffer.from(response.data, "binary").toString("base64");
@@ -43,12 +43,12 @@ const StabilityAITestComponent: React.FC = () => {
 
       if (error.response) {
         const errorMessage = error.response.headers["content-type"].includes(
-          "application/json"
+          "application/json",
         )
           ? JSON.stringify(
               JSON.parse(Buffer.from(error.response.data).toString()),
               null,
-              2
+              2,
             )
           : error.response.data.toString();
 
@@ -56,7 +56,7 @@ const StabilityAITestComponent: React.FC = () => {
         console.error("Response status:", error.response.status);
         console.error("Response headers:", error.response.headers);
         setError(
-          `Server responded with status ${error.response.status}: ${errorMessage}`
+          `Server responded with status ${error.response.status}: ${errorMessage}`,
         );
       } else if (error.request) {
         console.error("Request:", error.request);

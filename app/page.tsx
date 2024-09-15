@@ -1,5 +1,6 @@
 import RemoveBackgroundComponent from "@/components/stability-ai/remove-background";
 import StabilityAITestComponent from "@/components/stability-ai/StabilityAITestComponent";
+import StableFast3DComponent from "@/components/stability-ai/StableFast3DComponent";
 import BackgroundRemovalTester from "./backgroud-removal";
 
 export default function Home() {
@@ -9,6 +10,7 @@ export default function Home() {
         <BackgroundRemovalTester />
         <RemoveBackgroundComponent />
         <StabilityAITestComponent />
+        <StableFast3DComponent />
       </div>
     </div>
   );

@@ -43,7 +43,7 @@ const BackgroundRemovalTester: React.FC = () => {
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `HTTP error! status: ${response.status}, message: ${errorText}`
+          `HTTP error! status: ${response.status}, message: ${errorText}`,
         );
       }
 
@@ -54,7 +54,7 @@ const BackgroundRemovalTester: React.FC = () => {
       setError(
         `Virhe taustan poistossa: ${
           err instanceof Error ? err.message : "Tuntematon virhe"
-        }`
+        }`,
       );
     } finally {
       setIsLoading(false);

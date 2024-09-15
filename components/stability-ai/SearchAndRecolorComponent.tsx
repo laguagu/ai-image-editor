@@ -45,7 +45,7 @@ const SearchAndRecolorComponent: React.FC = () => {
             Accept: "image/*",
           },
           responseType: "arraybuffer",
-        }
+        },
       );
 
       if (response.status === 200) {
@@ -53,7 +53,7 @@ const SearchAndRecolorComponent: React.FC = () => {
         setResult(`data:image/${outputFormat};base64,${base64}`);
       } else {
         throw new Error(
-          `${response.status}: ${Buffer.from(response.data).toString()}`
+          `${response.status}: ${Buffer.from(response.data).toString()}`,
         );
       }
     } catch (error: any) {
