@@ -1,28 +1,31 @@
-/**
- * Component that allows users to search and replace elements in an image using the Stability AI API.
- * Esimerkki prompt: husky standing on a beach with ocean waves
- * Esimerkki search_prompt: background
- * Toinen: golden retriever standing on a beach with ocean waves
- */
-
 "use client";
 
+/*
+Esimerkki prompt: a modern living room with white walls and wooden floor
+*/
 import axios from "axios";
 import React, { useState } from "react";
 
-const StabilityAISearchReplace: React.FC = () => {
+const StabilityAIInpaint: React.FC = () => {
   const [image, setImage] = useState<File | null>(null);
-  const [desiredOutput, setDesiredOutput] = useState("");
-  const [replaceElement, setReplaceElement] = useState("");
+  const [mask, setMask] = useState<File | null>(null);
+  const [prompt, setPrompt] = useState(
+    "a modern living room with white walls and wooden floor"
+  );
   const [outputFormat, setOutputFormat] = useState("webp");
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string>("");
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: "image" | "mask"
+  ) => {
     if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0]);
+      const file = e.target.files[0];
+      if (type === "image") setImage(file);
+      else setMask(file);
     }
   };
 
@@ -37,29 +40,27 @@ const StabilityAISearchReplace: React.FC = () => {
     setResult(null);
     setDebugInfo("");
 
-    if (!image || !desiredOutput || !replaceElement) {
-      setError(
-        "Please provide an image, desired output description, and element to replace.",
-      );
+    if (!image || !mask || !prompt) {
+      setError("Please provide an image, mask, and prompt.");
       setLoading(false);
       return;
     }
 
     addDebugInfo(`Image size: ${image.size} bytes`);
-    addDebugInfo(`Desired Output (prompt): ${desiredOutput}`);
-    addDebugInfo(`Replace Element (search_prompt): ${replaceElement}`);
+    addDebugInfo(`Mask size: ${mask.size} bytes`);
+    addDebugInfo(`Prompt: ${prompt}`);
     addDebugInfo(`Output format: ${outputFormat}`);
 
     const formData = new FormData();
     formData.append("image", image);
-    formData.append("prompt", desiredOutput);
-    formData.append("search_prompt", replaceElement);
+    formData.append("mask", mask);
+    formData.append("prompt", prompt);
     formData.append("output_format", outputFormat);
 
     try {
       addDebugInfo("Sending request to API...");
       const response = await axios.post(
-        "https://api.stability.ai/v2beta/stable-image/edit/search-and-replace",
+        "https://api.stability.ai/v2beta/stable-image/edit/inpaint",
         formData,
         {
           headers: {
@@ -68,7 +69,7 @@ const StabilityAISearchReplace: React.FC = () => {
             "Content-Type": "multipart/form-data",
           },
           responseType: "arraybuffer",
-        },
+        }
       );
 
       addDebugInfo(`Response status: ${response.status}`);
@@ -80,7 +81,7 @@ const StabilityAISearchReplace: React.FC = () => {
         addDebugInfo("Image successfully processed and displayed");
       } else {
         throw new Error(
-          `${response.status}: ${Buffer.from(response.data).toString()}`,
+          `${response.status}: ${Buffer.from(response.data).toString()}`
         );
       }
     } catch (error: any) {
@@ -89,14 +90,14 @@ const StabilityAISearchReplace: React.FC = () => {
       if (error.response) {
         addDebugInfo(`Error status: ${error.response.status}`);
         addDebugInfo(
-          `Error data: ${Buffer.from(error.response.data).toString()}`,
+          `Error data: ${Buffer.from(error.response.data).toString()}`
         );
         setError(
-          `Error ${error.response.status}: ${Buffer.from(error.response.data).toString()}`,
+          `Error ${error.response.status}: ${Buffer.from(error.response.data).toString()}`
         );
       } else {
         setError(
-          error.message || "An error occurred while processing the image.",
+          error.message || "An error occurred while processing the image."
         );
       }
     }
@@ -106,64 +107,62 @@ const StabilityAISearchReplace: React.FC = () => {
 
   return (
     <div className="max-w-md mx-auto mt-10">
-      <h2 className="text-2xl font-bold mb-4">
-        Stability AI Search and Replace
-      </h2>
+      <h2 className="text-2xl font-bold mb-4">Poista kuvan tausta</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label
             htmlFor="image"
             className="block text-sm font-medium text-gray-700"
           >
-            Image to Edit
+            Original Image
           </label>
           <input
             type="file"
             id="image"
             accept="image/*"
-            onChange={handleImageChange}
+            onChange={(e) => handleFileChange(e, "image")}
             className="mt-1 block w-full"
             required
           />
         </div>
         <div>
           <label
-            htmlFor="desiredOutput"
+            htmlFor="mask"
             className="block text-sm font-medium text-gray-700"
           >
-            Desired Output Description (prompt)
+            Mask Image
           </label>
           <input
-            type="text"
-            id="desiredOutput"
-            value={desiredOutput}
-            onChange={(e) => setDesiredOutput(e.target.value)}
-            placeholder="e.g., Golden retriever standing in a field"
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            type="file"
+            id="mask"
+            accept="image/*"
+            onChange={(e) => handleFileChange(e, "mask")}
+            className="mt-1 block w-full"
             required
           />
           <p className="mt-1 text-sm text-gray-500">
-            Describe what you want to see in the final image.
+            Upload a black and white mask image. White areas will be replaced,
+            black areas will be preserved.
           </p>
         </div>
         <div>
           <label
-            htmlFor="replaceElement"
+            htmlFor="prompt"
             className="block text-sm font-medium text-gray-700"
           >
-            Element to Replace (search_prompt)
+            Prompt
           </label>
           <input
             type="text"
-            id="replaceElement"
-            value={replaceElement}
-            onChange={(e) => setReplaceElement(e.target.value)}
-            placeholder="e.g., dog"
+            id="prompt"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            placeholder="e.g., A modern kitchen with stainless steel appliances"
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
             required
           />
           <p className="mt-1 text-sm text-gray-500">
-            Describe what you want to replace in the original image.
+            Describe what you want to see in the white areas of the mask.
           </p>
         </div>
         <div>
@@ -189,7 +188,7 @@ const StabilityAISearchReplace: React.FC = () => {
           disabled={loading}
           className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 disabled:bg-gray-400"
         >
-          {loading ? "Processing..." : "Replace Element"}
+          {loading ? "Processing..." : "Generate Image"}
         </button>
       </form>
       {error && <p className="text-red-500 mt-4">{error}</p>}
@@ -198,7 +197,7 @@ const StabilityAISearchReplace: React.FC = () => {
           <h3 className="text-lg font-semibold mb-2">Result:</h3>
           <img
             src={result}
-            alt="Edited image"
+            alt="Generated image"
             className="max-w-full rounded-md shadow-lg"
           />
         </div>
@@ -209,8 +208,17 @@ const StabilityAISearchReplace: React.FC = () => {
           {debugInfo}
         </pre>
       </div>
+      <div>
+        <p className="text-gray-600 text-sm">
+          Vinkkejä hyvän maskin luomiseen: Varmista, että maski on tarkka
+          reunoiltaan. Käytä pehmeää sivellintä (soft brush) tarvittaessa
+          pehmentääksesi reunoja. Tarkista, että maski on täysin mustavalkoinen
+          ilman harmaasävyjä. Maskin tulee olla sama kokoa kuin alkuperäinen
+          kuva.
+        </p>
+      </div>
     </div>
   );
 };
 
-export default StabilityAISearchReplace;
+export default StabilityAIInpaint;
