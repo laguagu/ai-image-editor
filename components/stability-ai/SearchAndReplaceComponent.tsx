@@ -7,8 +7,19 @@
 
 "use client";
 
+import { Label } from "@radix-ui/react-label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@radix-ui/react-select";
 import axios from "axios";
 import React, { useState } from "react";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
 
 const StabilityAISearchReplace: React.FC = () => {
   const [image, setImage] = useState<File | null>(null);
@@ -105,92 +116,54 @@ const StabilityAISearchReplace: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10">
-      <h2 className="text-2xl font-bold mb-4">
-        Stability AI Search and Replace
-      </h2>
+    <div className="space-y-6">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label
-            htmlFor="image"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Image to Edit
-          </label>
-          <input
-            type="file"
+        <div className="space-y-2">
+          <Label htmlFor="image">Image to Edit</Label>
+          <Input
             id="image"
+            type="file"
             accept="image/*"
             onChange={handleImageChange}
-            className="mt-1 block w-full"
             required
           />
         </div>
-        <div>
-          <label
-            htmlFor="desiredOutput"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Desired Output Description (prompt)
-          </label>
-          <input
-            type="text"
+        <div className="space-y-2">
+          <Label htmlFor="desiredOutput">Desired Output Description</Label>
+          <Textarea
             id="desiredOutput"
             value={desiredOutput}
             onChange={(e) => setDesiredOutput(e.target.value)}
-            placeholder="e.g., Golden retriever standing in a field"
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            placeholder="e.g., golden retriever in a field"
             required
           />
-          <p className="mt-1 text-sm text-gray-500">
-            Describe what you want to see in the final image.
-          </p>
         </div>
-        <div>
-          <label
-            htmlFor="replaceElement"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Element to Replace (search_prompt)
-          </label>
-          <input
-            type="text"
+        <div className="space-y-2">
+          <Label htmlFor="replaceElement">Element to Replace</Label>
+          <Input
             id="replaceElement"
             value={replaceElement}
             onChange={(e) => setReplaceElement(e.target.value)}
             placeholder="e.g., dog"
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
             required
           />
-          <p className="mt-1 text-sm text-gray-500">
-            Describe what you want to replace in the original image.
-          </p>
         </div>
-        <div>
-          <label
-            htmlFor="outputFormat"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Output Format
-          </label>
-          <select
-            id="outputFormat"
-            value={outputFormat}
-            onChange={(e) => setOutputFormat(e.target.value)}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-          >
-            <option value="webp">WebP</option>
-            <option value="png">PNG</option>
-            <option value="jpeg">JPEG</option>
-          </select>
+        <div className="space-y-2">
+          <Label htmlFor="outputFormat">Output Format</Label>
+          <Select value={outputFormat} onValueChange={setOutputFormat}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select format" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="webp">WebP</SelectItem>
+              <SelectItem value="png">PNG</SelectItem>
+              <SelectItem value="jpeg">JPEG</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 disabled:bg-gray-400"
-        >
+        <Button type="submit" disabled={loading} className="w-full">
           {loading ? "Processing..." : "Replace Element"}
-        </button>
+        </Button>
       </form>
       {error && <p className="text-red-500 mt-4">{error}</p>}
       {result && (
@@ -204,8 +177,8 @@ const StabilityAISearchReplace: React.FC = () => {
         </div>
       )}
       <div className="mt-6">
-        <h3 className="text-lg font-semibold mb-2">Debug Information:</h3>
-        <pre className="bg-gray-100 p-4 rounded-md overflow-x-auto">
+        <h3 className="text-lg font-semibold mb-2">Debug Info:</h3>
+        <pre className="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm">
           {debugInfo}
         </pre>
       </div>
