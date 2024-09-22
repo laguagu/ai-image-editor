@@ -20,9 +20,7 @@ const StabilityAIInpaint: React.FC = () => {
   const [image, setImage] = useState<File | null>(null);
   const [mask, setMask] = useState<File | null>(null);
   const [maskOption, setMaskOption] = useState("auto");
-  const [prompt, setPrompt] = useState(
-    "a modern living room with white walls and wooden floor",
-  );
+  const [prompt, setPrompt] = useState("A sunny day in Helsinki");
   const [outputFormat, setOutputFormat] = useState("webp");
   const [growMask, setGrowMask] = useState(5);
   const [result, setResult] = useState<string | null>(null);
