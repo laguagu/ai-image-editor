@@ -8,17 +8,18 @@
 "use client";
 
 import { Label } from "@radix-ui/react-label";
+
+import axios from "axios";
+import React, { useState } from "react";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@radix-ui/react-select";
-import axios from "axios";
-import React, { useState } from "react";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
+} from "../ui/select";
 import { Textarea } from "../ui/textarea";
 
 const StabilityAISearchReplace: React.FC = () => {
