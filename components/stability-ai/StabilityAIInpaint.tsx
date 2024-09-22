@@ -1,18 +1,18 @@
 "use client";
 
 import { Label } from "@radix-ui/react-label";
+import axios from "axios";
+import React, { useState } from "react";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@radix-ui/react-select";
-import axios from "axios";
-import React, { useState } from "react";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+} from "../ui/select";
 import { Slider } from "../ui/slider";
 import { Textarea } from "../ui/textarea";
 
@@ -29,7 +29,7 @@ const StabilityAIInpaint: React.FC = () => {
 
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: "image" | "mask",
+    type: "image" | "mask"
   ) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -51,7 +51,7 @@ const StabilityAIInpaint: React.FC = () => {
         formData,
         {
           responseType: "blob",
-        },
+        }
       );
 
       const maskFile = new File([response.data], "mask.png", {
@@ -83,7 +83,7 @@ const StabilityAIInpaint: React.FC = () => {
         maskToUse = await createAutomaticMask(image);
       } catch (error) {
         setError(
-          "Failed to create automatic mask. Please try again or use a custom mask.",
+          "Failed to create automatic mask. Please try again or use a custom mask."
         );
         setLoading(false);
         return;
@@ -110,7 +110,7 @@ const StabilityAIInpaint: React.FC = () => {
             "Content-Type": "multipart/form-data",
           },
           responseType: "arraybuffer",
-        },
+        }
       );
 
       if (response.status === 200) {
@@ -118,18 +118,18 @@ const StabilityAIInpaint: React.FC = () => {
         setResult(`data:image/${outputFormat};base64,${base64}`);
       } else {
         throw new Error(
-          `${response.status}: ${Buffer.from(response.data).toString()}`,
+          `${response.status}: ${Buffer.from(response.data).toString()}`
         );
       }
     } catch (error: any) {
       console.error("Error:", error);
       if (error.response) {
         setError(
-          `Error ${error.response.status}: ${Buffer.from(error.response.data).toString()}`,
+          `Error ${error.response.status}: ${Buffer.from(error.response.data).toString()}`
         );
       } else {
         setError(
-          error.message || "An error occurred while processing the image.",
+          error.message || "An error occurred while processing the image."
         );
       }
     }
