@@ -1,0 +1,12 @@
+---
+# route.yaml
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: stability-ai-frontend-route
+spec:
+  to:
+    kind: Service
+    name: stability-ai-frontend-service
+  port:
+    targetPort: 3000

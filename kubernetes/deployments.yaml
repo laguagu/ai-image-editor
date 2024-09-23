@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stability-ai-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stability-ai-frontend
+  template:
+    metadata:
+      labels:
+        app: stability-ai-frontend
+    spec:
+      containers:
+        - name: stability-ai-frontend
+          image: image-registry.apps.2.rahti.csc.fi/alyakokeilut/stability-ai-frontend-image:v1
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stability-ai-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stability-ai-backend
+  template:
+    metadata:
+      labels:
+        app: stability-ai-backend
+    spec:
+      containers:
+        - name: stability-ai-backend
+          image: image-registry.apps.2.rahti.csc.fi/alyakokeilut/stability-ai-backend-image:v1
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi

@@ -1,18 +1,19 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException, Form
-from fastapi.responses import StreamingResponse, JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-from rembg import remove, new_session
-from PIL import Image, UnidentifiedImageError
-import io
 import base64
+import io
 from typing import Optional
+
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, StreamingResponse
+from PIL import Image, UnidentifiedImageError
+from rembg import new_session, remove
 
 app = FastAPI()
 
 # CORS-middleware config
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

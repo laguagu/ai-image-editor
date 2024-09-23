@@ -43,3 +43,29 @@ export async function generateImage(prompt: string) {
     return { success: false, error: errorMessage };
   }
 }
+
+export const createAutomaticMask = async (imageBuffer: ArrayBuffer) => {
+  const formData = new FormData();
+  formData.append("file", new Blob([imageBuffer]), "image.png");
+  console.log("createAutomaticMask called");
+
+  try {
+    const response = await axios.post(
+      "http://stability-ai-backend-service.alyakokeilut.svc.cluster.local:8000/create_mask/",
+      formData,
+      {
+        responseType: "arraybuffer",
+      },
+    );
+
+    return response.data;
+  } catch (error: any) {
+    console.error("Error creating mask:", error);
+
+    const errorMessage = error.response
+      ? `Server error: ${error.response.status} ${error.response.data}`
+      : `Request error: ${error.message}`;
+
+    throw new Error(errorMessage);
+  }
+};

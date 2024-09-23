@@ -29,7 +29,7 @@ const StabilityAIInpaint: React.FC = () => {
 
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: "image" | "mask"
+    type: "image" | "mask",
   ) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -46,18 +46,17 @@ const StabilityAIInpaint: React.FC = () => {
     formData.append("file", imageFile);
 
     try {
-      const response = await axios.post(
-        "http://localhost:8000/create_mask/",
-        formData,
-        {
-          responseType: "blob",
-        }
-      );
-
-      const maskFile = new File([response.data], "mask.png", {
-        type: "image/png",
+      const response = await fetch("/api/create-mask", {
+        method: "POST",
+        body: formData,
       });
-      return maskFile;
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const maskBlob = await response.blob();
+      return new File([maskBlob], "mask.png", { type: "image/png" });
     } catch (error) {
       console.error("Error creating mask:", error);
       throw new Error("Failed to create mask automatically.");
@@ -65,6 +64,8 @@ const StabilityAIInpaint: React.FC = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    console.log("Submit button clicked"); // Varmista, että tämä toimii
+
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -82,9 +83,11 @@ const StabilityAIInpaint: React.FC = () => {
       try {
         maskToUse = await createAutomaticMask(image);
       } catch (error) {
-        setError(
-          "Failed to create automatic mask. Please try again or use a custom mask."
-        );
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError("An unknown error occurred.");
+        }
         setLoading(false);
         return;
       }
@@ -110,7 +113,7 @@ const StabilityAIInpaint: React.FC = () => {
             "Content-Type": "multipart/form-data",
           },
           responseType: "arraybuffer",
-        }
+        },
       );
 
       if (response.status === 200) {
@@ -118,18 +121,18 @@ const StabilityAIInpaint: React.FC = () => {
         setResult(`data:image/${outputFormat};base64,${base64}`);
       } else {
         throw new Error(
-          `${response.status}: ${Buffer.from(response.data).toString()}`
+          `${response.status}: ${Buffer.from(response.data).toString()}`,
         );
       }
     } catch (error: any) {
       console.error("Error:", error);
       if (error.response) {
         setError(
-          `Error ${error.response.status}: ${Buffer.from(error.response.data).toString()}`
+          `Error ${error.response.status}: ${Buffer.from(error.response.data).toString()}`,
         );
       } else {
         setError(
-          error.message || "An error occurred while processing the image."
+          error.message || "An error occurred while processing the image.",
         );
       }
     }

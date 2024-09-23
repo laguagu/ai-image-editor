@@ -1,0 +1,16 @@
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: stability-ai-frontend-image
+spec:
+  lookupPolicy:
+    local: false
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: stability-ai-backend-image
+spec:
+  lookupPolicy:
+    local: false

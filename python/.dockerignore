@@ -1,0 +1,46 @@
+# Pythonin väliaikaiset tiedostot
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.pdb
+*.egg-info/
+*.eggs/
+*.whl
+main.py
+
+# Virtuaaliympäristöt
+venv/
+.env/
+.myenv/
+myenv/
+
+# Git-versiohallinnan tiedostot
+.git/
+.gitignore
+
+# Järjestelmäkohtaiset tiedostot
+.DS_Store
+*.swp
+*.swo
+*.tmp
+*~
+
+# Väliaikaiset tiedostot ja lokit
+logs/
+*.log
+*.tmp
+*.out
+tmp/
+*.cache
+*.coverage
+
+# Testitiedostot ja hakemistot
+tests/
+test/
+*.spec
+*.test.js
+.coverage
+.nox/
+.tox/
+

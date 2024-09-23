@@ -1,97 +1,69 @@
-# Kuvan muokkaus tekoälyn avulla
+# Image Editing with Artificial Intelligence
 
-Tämä projekti mahdollistaa kuvien muokkaamisen tekoälyn avulla käyttäen Stability AI:n API:a. Projektissa on kaksi pääominaisuutta: taustan muokkaus ja Search and Replace -toiminto.
+This project enables image editing using artificial intelligence powered by the Stability AI API. The project has two main features: background modification and Search and Replace functionality.
 
-## Miten se toimii?
+## How It Works
 
-### Taustan muokkaus
+### Background Modification
 
-1. Käyttäjä lataa alkuperäisen kuvan.
-2. Käyttäjä voi valita automaattisen maskin luonnin tai ladata oman maskin.
-3. Jos valitaan automaattinen maski, backend luo maskin alkuperäisestä kuvasta.
-4. Käyttäjä antaa kuvauksen haluamastaan uudesta taustasta.
-5. Tekoäly generoi uuden kuvan annettujen tietojen perusteella.
-
-### Search and Replace
-
-1. Käyttäjä lataa muokattavan kuvan.
-2. Käyttäjä kirjoittaa kuvauksen haluamastaan lopputuloksesta (`prompt`).
-3. Käyttäjä määrittelee korvattavan elementin (`search_prompt`).
-4. Tekoäly tunnistaa ja korvaa määritellyn elementin automaattisesti ilman erillistä maskia.
-
-## Esimerkkikuvat
-
-### Taustan muokkaus
-
-#### Alkuperäinen kuva
-
-![Alkuperäinen kuva](public/example-images/auto.png)
-
-_Kuvateksti: Tämä on alkuperäinen kuva, jota käytämme esimerkkinä taustan muokkauksessa._
-
-#### Luotu maski
-
-![Luotu maski](public/example-images/temp_mask.png)
-
-_Kuvateksti: Tämä on automaattisesti luotu maski. Valkoiset alueet korvataan uudella sisällöllä, mustat alueet säilytetään._
-
-#### Lopullinen tulos (taustan muokkaus)
-
-![Lopullinen tulos taustan muokkauksesta](public/example-images/example-2.png)
-
-_Kuvateksti: Tämä on lopullinen tulos, jossa alkuperäisen kuvan tausta on muokattu annetun kuvauksen mukaisesti._
+1. The user uploads an original image.
+2. The user can choose automatic mask creation or upload their own mask.
+3. If automatic mask is selected, the backend creates a mask from the original image.
+4. The user provides a description of the desired new background.
+5. AI generates a new image based on the provided information.
 
 ### Search and Replace
 
-#### Alkuperäinen kuva
+1. The user uploads an image to be edited.
+2. The user writes a description of the desired result (`prompt`).
+3. The user defines the element to be replaced (`search_prompt`).
+4. AI automatically identifies and replaces the defined element without a separate mask.
 
-![Alkuperäinen kuva Search and Replace](public/example-images/husky.png)
+## Example Images
 
-_Kuvateksti: Tämä on alkuperäinen kuva, jota käytämme esimerkkinä Search and Replace -toiminnossa._
+### Background Modification
 
-#### Lopullinen tulos (Search and Replace)
+#### Original Image
 
-![Lopullinen tulos Search and Replace](public/example-images/example-1.png)
+![Original Image](public/example-images/auto.png)
 
-_Kuvateksti: Tämä on lopullinen tulos Search and Replace -toiminnosta, jossa määritelty elementti on korvattu uudella._
+_Caption: This is the original image we use as an example for background modification._
 
-## Tekninen toteutus
+#### Created Mask
 
-- Frontend: React.js
-- Backend: FastAPI (taustan muokkauksessa maskin luontiin)
-- Tekoäly-API: Stability AI
+![Created Mask](public/example-images/temp_mask.png)
 
-Backend luo maskin käyttäen `rembg`-kirjastoa taustan poistamiseen taustan muokkaus -ominaisuudessa. Frontend kommunikoi sekä oman backendin että Stability AI:n API:n kanssa.
+_Caption: This is an automatically generated mask. White areas will be replaced with new content, black areas will be preserved._
 
-## Käyttöohjeet
+#### Final Result (Background Modification)
 
-### Taustan muokkaus
+![Final Result of Background Modification](public/example-images/example-2.png)
 
-1. Lataa alkuperäinen kuva.
-2. Valitse "Use automatic mask" tai lataa oma maski.
-3. Kirjoita kuvaus haluamastasi uudesta taustasta.
-4. Paina "Create Edited Image" -nappia.
-5. Odota hetki, kun tekoäly generoi uuden kuvan.
-6. Lataa valmis kuva "Download Image" -napilla.
+_Caption: This is the final result where the background of the original image has been modified according to the given description._
 
 ### Search and Replace
 
-1. Lataa muokattava kuva.
-2. Kirjoita kuvaus haluamastasi lopputuloksesta (Desired Output Description).
-3. Määrittele korvattava elementti (Element to Replace).
-4. Valitse haluttu tuloskuvan formaatti.
-5. Paina "Replace Element" -nappia.
-6. Odota hetki, kun tekoäly generoi uuden kuvan.
+#### Original Image
 
-## Huomioitavaa
+![Original Image for Search and Replace](public/example-images/husky.png)
 
-- Automaattinen maskin luonti toimii parhaiten kuvilla, joissa on selkeä etu- ja taka-ala.
-- Search and Replace -toiminto ei vaadi erillistä maskia, vaan se tunnistaa korvattavan elementin automaattisesti.
-- Parhaan tuloksen saat käyttämällä tarkkaa ja kuvailevaa tekstiä haluamastasi lopputuloksesta.
-- Prosessi voi kestää muutamia sekunteja riippuen kuvan koosta ja monimutkaisuudesta.
-- Search and Replace -toiminto kuluttaa 4 krediittiä per onnistunut generointi, kun taas taustan muokkaus kuluttaa 3 krediittiä.
+_Caption: This is the original image we use as an example for the Search and Replace function._
 
-## Projektin rakenne
+#### Final Result (Search and Replace)
+
+![Final Result of Search and Replace](public/example-images/example-1.png)
+
+_Caption: This is the final result of the Search and Replace function, where the defined element has been replaced with a new one._
+
+## Technical Implementation
+
+- Frontend: React.js, Next.js
+- Backend: FastAPI (Python, for mask creation in background modification)
+- AI API: Stability AI
+
+The backend creates a mask using the `rembg` library for background removal in the background modification feature. The frontend communicates with both our own backend and the Stability AI API.
+
+## Project Structure
 
 ```
 background-remover/
@@ -103,39 +75,51 @@ background-remover/
 ├── python/
 │   ├── __pycache__/
 │   ├── myenv/
+│   ├── Dockerfile
 │   ├── main.py
 │   ├── mask_api.py
 │   ├── requirements.txt
 │   └── sohva.jpg
-├── next.config.mjs
+├── .dockerignore
+├── docker-compose.yml
+├── Dockerfile
+├── next.config.js
 ├── package.json
-├── tsconfig.json
-└── README.md
+├── README.md
+└── [other configuration files]
 ```
 
-## Miten se toimii?
+## Usage Instructions
 
-[Aiemmat osiot pysyvät samoina]
+### Background Modification
 
-## Tekninen toteutus
+1. Upload the original image.
+2. Select "Use automatic mask" or upload your own mask.
+3. Write a description of your desired new background.
+4. Click the "Create Edited Image" button.
+5. Wait a moment while the AI generates a new image.
+6. Download the finished image with the "Download Image" button.
 
-- Frontend: React.js, Next.js
-- Backend: FastAPI (Python)
-- Tekoäly-API: Stability AI
+### Search and Replace
 
-Backend luo maskin käyttäen `rembg`-kirjastoa taustan poistamiseen taustan muokkaus -ominaisuudessa. Frontend kommunikoi sekä oman backendin että Stability AI:n API:n kanssa.
+1. Upload the image to be edited.
+2. Write a description of your desired result (Desired Output Description).
+3. Define the element to be replaced (Element to Replace).
+4. Select the desired output image format.
+5. Click the "Replace Element" button.
+6. Wait a moment while the AI generates a new image.
 
-## Käyttöönotto ja käynnistys
+## Setup and Launch
 
 ### Backend (FastAPI)
 
-1. Siirry Python-backendin hakemistoon:
+1. Navigate to the Python backend directory:
 
    ```
    cd python
    ```
 
-2. (Suositeltu) Luo ja aktivoi virtuaaliympäristö:
+2. (Recommended) Create and activate a virtual environment:
 
    ```
    python -m venv myenv
@@ -143,50 +127,80 @@ Backend luo maskin käyttäen `rembg`-kirjastoa taustan poistamiseen taustan muo
    myenv\Scripts\activate  # Windows
    ```
 
-3. Asenna tarvittavat riippuvuudet:
+3. Install required dependencies:
 
    ```
    pip install -r requirements.txt
    ```
 
-4. Käynnistä FastAPI-palvelin:
+4. Start the FastAPI server:
 
    ```
    uvicorn mask_api:app --reload
    ```
 
-   Palvelin käynnistyy osoitteeseen `http://localhost:8000`.
+   The server will start at `http://localhost:8000`.
 
 ### Frontend (Next.js)
 
-1. Asenna tarvittavat npm-paketit projektin juurihakemistossa:
+1. Install required npm packages in the project root directory:
 
    ```
    npm install
    ```
 
-2. Käynnistä kehityspalvelin:
+2. Start the development server:
 
    ```
    npm run dev
    ```
 
-   Frontend-sovellus käynnistyy osoitteeseen `http://localhost:3000`.
+   The frontend application will start at `http://localhost:3000`.
 
-## Huomioitavaa
+## Containerized Version (Docker)
 
-- Varmista, että sekä frontend- että backend-palvelimet ovat käynnissä samanaikaisesti.
-- Backend-palvelin (FastAPI) tulee käynnistää ennen frontend-sovellusta.
-- Automaattinen maskin luonti toimii parhaiten kuvilla, joissa on selkeä etu- ja taka-ala.
-- Search and Replace -toiminto ei vaadi erillistä maskia, vaan se tunnistaa korvattavan elementin automaattisesti.
-- Parhaan tuloksen saat käyttämällä tarkkaa ja kuvailevaa tekstiä haluamastasi lopputuloksesta.
-- Prosessi voi kestää muutamia sekunteja riippuen kuvan koosta ja monimutkaisuudesta.
-- Search and Replace -toiminto kuluttaa 4 krediittiä per onnistunut generointi, kun taas taustan muokkaus kuluttaa 3 krediittiä.
+1. Clone the repository:
 
-## Ympäristömuuttujat
+   ```
+   git clone [repository-url]
+   cd background-remover
+   ```
 
-Varmista, että olet asettanut seuraavat ympäristömuuttujat:
+2. Set environment variables:
 
-- `NEXT_PUBLIC_STABILITY_API_KEY`: Stability AI API-avain
+   - Create a `.env` file in the project root directory
+   - Add the line: `NEXT_PUBLIC_STABILITY_API_KEY=your_api_key`
 
-Voit asettaa nämä `.env`-tiedostossa projektin juurihakemistossa.
+3. Build and start the containers:
+
+   ```
+   docker-compose up --build
+   ```
+
+4. The application is now available at:
+
+   - Frontend: `http://localhost:3000`
+   - Backend: `http://localhost:8000`
+
+5. To stop and remove the containers, use:
+   ```
+   docker-compose down
+   ```
+
+## Environment Variables
+
+Ensure you have set the following environment variables:
+
+- `NEXT_PUBLIC_STABILITY_API_KEY`: Stability AI API key
+
+You can set these in a `.env` file in the project root directory.
+
+## Things to Note
+
+- Ensure that both frontend and backend servers are running simultaneously.
+- The backend server (FastAPI) should be started before the frontend application.
+- Automatic mask creation works best with images that have a clear foreground and background.
+- The Search and Replace function doesn't require a separate mask; it automatically identifies the element to be replaced.
+- For best results, use accurate and descriptive text for your desired outcome.
+- The process may take a few seconds depending on the size and complexity of the image.
+- The Search and Replace function consumes 4 credits per successful generation, while background modification consumes 3 credits.

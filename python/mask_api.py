@@ -1,10 +1,12 @@
 import io
+import logging
 import os
+import tempfile
 
 import numpy as np
-from fastapi import FastAPI, File, UploadFile
+from fastapi import BackgroundTasks, FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from PIL import Image
 from rembg import remove
 
@@ -13,50 +15,63 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     # Lisää tähän frontend-sovelluksesi osoite
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
+@app.get("/test")
+async def test_endpoint():
+    return JSONResponse(content={"message": "Toimii."})
+
+
 @app.post("/create_mask/")
-async def create_mask(file: UploadFile = File(...)):
-    # Lue ladattu kuva
-    contents = await file.read()
-    img = Image.open(io.BytesIO(contents)).convert('RGBA')
+async def create_mask(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
+    try:
+        logging.info("Received file: %s", file.filename)
 
-    # Poista tausta käyttäen rembg-kirjastoa
-    img_no_bg = remove(img)
+        # Lue ladattu kuva
+        contents = await file.read()
+        logging.info("File read successfully")
 
-    # Muunna kuva NumPy-taulukoksi
-    data = np.array(img_no_bg)
+        img = Image.open(io.BytesIO(contents)).convert('RGBA')
+        logging.info("Image opened and converted to RGBA")
 
-    # Erota alpha-kanava
-    alpha = data[:, :, 3]
+        # Poista tausta käyttäen rembg-kirjastoa
+        img_no_bg = remove(img)
+        logging.info("Background removed successfully")
 
-    # Luo maski perustuen alpha-kanavaan (käänteinen Stability AI:ta varten)
-    # Täysin läpinäkyvät pikselit (alpha == 0) muuttuvat valkoisiksi (255)
-    # Kaikki muut pikselit muuttuvat mustiksi (0)
-    mask = np.where(alpha == 0, 255, 0).astype(np.uint8)
+        # Muunna kuva NumPy-taulukoksi
+        data = np.array(img_no_bg)
+        logging.info("Image converted to NumPy array")
 
-    # Luo uusi kuva maskista
-    mask_img = Image.fromarray(mask, mode='L')
+        # Erota alpha-kanava
+        alpha = data[:, :, 3]
 
-    # Tallenna maski väliaikaisesti
-    temp_file = "temp_mask.png"
-    mask_img.save(temp_file)
+        # Luo maski perustuen alpha-kanavaan
+        mask = np.where(alpha == 0, 255, 0).astype(np.uint8)
+        logging.info("Mask created successfully")
 
-    # Palauta maski
-    return FileResponse(temp_file, media_type="image/png", filename="mask.png")
+        # Luo uusi kuva maskista
+        mask_img = Image.fromarray(mask, mode='L')
 
+        # Luo väliaikainen tiedosto tempfile-kirjaston avulla
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as temp:
+            mask_img.save(temp.name)
+            temp_file = temp.name
+            logging.info("Mask saved as temporary file: %s", temp_file)
 
-@app.on_event("shutdown")
-def shutdown_event():
-    # Poista väliaikainen tiedosto kun sovellus suljetaan
-    if os.path.exists("temp_mask.png"):
-        os.remove("temp_mask.png")
+        # Poista väliaikainen tiedosto vastauksen jälkeen
+        background_tasks.add_task(os.remove, temp_file)
 
+        # Palauta maski
+        return FileResponse(temp_file, media_type="image/png", filename="mask.png")
+
+    except Exception as e:
+        logging.error("Error processing file: %s", str(e))
+        return JSONResponse(status_code=500, content={"message": "Internal Server Error", "detail": str(e)})
 
 if __name__ == "__main__":
     import uvicorn
