@@ -204,3 +204,11 @@ You can set these in a `.env` file in the project root directory.
 - For best results, use accurate and descriptive text for your desired outcome.
 - The process may take a few seconds depending on the size and complexity of the image.
 - The Search and Replace function consumes 4 credits per successful generation, while background modification consumes 3 credits.
+
+## Alternative Image Generation Options
+
+It's worth noting that Stability AI models, as well as other image generation models, can be used at a lower cost through Replicate. For example, the inpainting model can be run on Replicate for approximately $0.0057 per run, or about 175 runs per $1. The exact cost may vary depending on your inputs.
+
+You can find the Stable Diffusion Inpainting model on Replicate here: [https://replicate.com/stability-ai/stable-diffusion-inpainting](https://replicate.com/stability-ai/stable-diffusion-inpainting)
+
+Additionally, this model is open source, which means you can run it on your own computer using Docker if you prefer.
