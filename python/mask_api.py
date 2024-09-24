@@ -2,71 +2,96 @@ import io
 import logging
 import os
 import tempfile
-
 import numpy as np
+from datetime import datetime
 from fastapi import BackgroundTasks, FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from PIL import Image
-from rembg import remove
+from rembg import remove, new_session
+
+logging.basicConfig(level=logging.INFO)
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    # Lisää tähän frontend-sovelluksesi osoite
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+DEBUG_FOLDER = "debug_images"
+if not os.path.exists(DEBUG_FOLDER):
+    os.makedirs(DEBUG_FOLDER)
 
-@app.get("/test")
-async def test_endpoint():
-    return JSONResponse(content={"message": "Toimii."})
+# Määritä, käytetäänkö mukautettuja asetuksia vai ei
+USE_CUSTOM_SETTINGS = False  # Aseta False käyttääksesi oletusasetuksia
 
+# rembg asetukset
+REMBG_SETTINGS = {
+    "model_name": "u2net",
+    "alpha_matting": True,
+    "alpha_matting_foreground_threshold": 240,
+    "alpha_matting_background_threshold": 10,
+    "alpha_matting_erode_size": 10,
+}
+
+# Luo uusi sessio rembg:lle
+session = new_session(REMBG_SETTINGS["model_name"] if USE_CUSTOM_SETTINGS else "u2net")
 
 @app.post("/create_mask/")
 async def create_mask(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
     try:
         logging.info("Received file: %s", file.filename)
 
-        # Lue ladattu kuva
         contents = await file.read()
         logging.info("File read successfully")
 
         img = Image.open(io.BytesIO(contents)).convert('RGBA')
         logging.info("Image opened and converted to RGBA")
 
-        # Poista tausta käyttäen rembg-kirjastoa
-        img_no_bg = remove(img)
-        logging.info("Background removed successfully")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        original_debug_path = os.path.join(DEBUG_FOLDER, f"original_{timestamp}.png")
+        img.save(original_debug_path)
+        logging.info(f"Original image saved for debug: {original_debug_path}")
 
-        # Muunna kuva NumPy-taulukoksi
+        # Poista tausta käyttäen rembg-kirjastoa
+        if USE_CUSTOM_SETTINGS:
+            img_no_bg = remove(
+                img,
+                session=session,
+                alpha_matting=REMBG_SETTINGS["alpha_matting"],
+                alpha_matting_foreground_threshold=REMBG_SETTINGS["alpha_matting_foreground_threshold"],
+                alpha_matting_background_threshold=REMBG_SETTINGS["alpha_matting_background_threshold"],
+                alpha_matting_erode_size=REMBG_SETTINGS["alpha_matting_erode_size"]
+            )
+            logging.info("Background removed with custom settings")
+        else:
+            img_no_bg = remove(img, session=session)
+            logging.info("Background removed with default settings")
+
         data = np.array(img_no_bg)
         logging.info("Image converted to NumPy array")
 
-        # Erota alpha-kanava
         alpha = data[:, :, 3]
-
-        # Luo maski perustuen alpha-kanavaan
         mask = np.where(alpha == 0, 255, 0).astype(np.uint8)
         logging.info("Mask created successfully")
 
-        # Luo uusi kuva maskista
         mask_img = Image.fromarray(mask, mode='L')
 
-        # Luo väliaikainen tiedosto tempfile-kirjaston avulla
+        mask_debug_path = os.path.join(DEBUG_FOLDER, f"mask_{timestamp}.png")
+        mask_img.save(mask_debug_path)
+        logging.info(f"Mask saved for debug: {mask_debug_path}")
+
         with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as temp:
             mask_img.save(temp.name)
             temp_file = temp.name
             logging.info("Mask saved as temporary file: %s", temp_file)
 
-        # Poista väliaikainen tiedosto vastauksen jälkeen
         background_tasks.add_task(os.remove, temp_file)
 
-        # Palauta maski
         return FileResponse(temp_file, media_type="image/png", filename="mask.png")
 
     except Exception as e:

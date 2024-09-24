@@ -1,5 +1,5 @@
 "use client";
-import { generateImage } from "@/app/actions";
+import { generateImageAction } from "@/app/actions";
 import React, { ChangeEvent, useState } from "react";
 
 const StabilityAITestComponent: React.FC = () => {
@@ -20,7 +20,7 @@ const StabilityAITestComponent: React.FC = () => {
     setResult(null);
 
     try {
-      const result = await generateImage(prompt);
+      const result = await generateImageAction(prompt);
       if (result.success) {
         setResult(result.data ?? null);
       } else {

@@ -15,8 +15,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const response = await axios.post(
-      `${process.env.STABILITY_AI_BACKEND_URL}/create_mask/` ||
-        "http://localhost:8000/create_mask/",
+      `${process.env.FASTAPI_URL}`,
       newFormData,
       {
         responseType: "arraybuffer",

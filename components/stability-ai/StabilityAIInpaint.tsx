@@ -1,7 +1,8 @@
 "use client";
 
+import { inpaintAction } from "@/app/actions";
 import { Label } from "@radix-ui/react-label";
-import axios from "axios";
+import Image from "next/image";
 import React, { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -58,14 +59,17 @@ const StabilityAIInpaint: React.FC = () => {
       const maskBlob = await response.blob();
       return new File([maskBlob], "mask.png", { type: "image/png" });
     } catch (error) {
-      console.error("Error creating mask:", error);
+      if (error instanceof Error) {
+        console.error("Error creating mask:", error.message);
+      } else {
+        console.error("Error creating mask:", error);
+      }
       throw new Error("Failed to create mask automatically.");
     }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("Submit button clicked"); // Varmista, että tämä toimii
-
+    console.log("handleSubmit");
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -92,7 +96,9 @@ const StabilityAIInpaint: React.FC = () => {
         return;
       }
     }
-
+    // console.log("maskToUse", maskToUse);
+    // setLoading(false);
+    // return;
     const formData = new FormData();
     formData.append("image", image);
     if (maskToUse) {
@@ -102,41 +108,13 @@ const StabilityAIInpaint: React.FC = () => {
     formData.append("output_format", outputFormat);
     formData.append("grow_mask", growMask.toString());
 
-    try {
-      const response = await axios.post(
-        "https://api.stability.ai/v2beta/stable-image/edit/inpaint",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_STABILITY_API_KEY}`,
-            Accept: "image/*",
-            "Content-Type": "multipart/form-data",
-          },
-          responseType: "arraybuffer",
-        },
-      );
+    const response = await inpaintAction(formData);
 
-      if (response.status === 200) {
-        const base64 = Buffer.from(response.data, "binary").toString("base64");
-        setResult(`data:image/${outputFormat};base64,${base64}`);
-      } else {
-        throw new Error(
-          `${response.status}: ${Buffer.from(response.data).toString()}`,
-        );
-      }
-    } catch (error: any) {
-      console.error("Error:", error);
-      if (error.response) {
-        setError(
-          `Error ${error.response.status}: ${Buffer.from(error.response.data).toString()}`,
-        );
-      } else {
-        setError(
-          error.message || "An error occurred while processing the image.",
-        );
-      }
+    if (response.data) {
+      setResult(response.data);
+    } else {
+      setError(response.error);
     }
-
     setLoading(false);
   };
 
@@ -150,6 +128,7 @@ const StabilityAIInpaint: React.FC = () => {
       document.body.removeChild(link);
     }
   };
+
   return (
     <div className="space-y-6">
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -245,11 +224,14 @@ const StabilityAIInpaint: React.FC = () => {
       {result && (
         <div className="mt-6 space-y-4">
           <h3 className="text-lg font-semibold mb-2">Result:</h3>
-          <img
-            src={result}
-            alt="Edited image"
-            className="max-w-full rounded-md shadow-lg"
-          />
+          <div className="relative w-full max-w-[800px] aspect-[4/3]">
+            <Image
+              src={result}
+              alt="Edited image"
+              fill
+              className="object-contain rounded-md shadow-lg"
+            />
+          </div>
           <Button onClick={handleDownload} className="w-full">
             Download Image
           </Button>

@@ -1,15 +1,7 @@
-/**
- * Component that allows users to search and replace elements in an image using the Stability AI API.
- * Esimerkki prompt: husky standing on a beach with ocean waves
- * Esimerkki search_prompt: background
- * Toinen: golden retriever standing on a beach with ocean waves
- */
-
 "use client";
 
+import { searchAndReplaceAction } from "@/app/actions";
 import { Label } from "@radix-ui/react-label";
-
-import axios from "axios";
 import React, { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -22,6 +14,12 @@ import {
 } from "../ui/select";
 import { Textarea } from "../ui/textarea";
 
+/**
+ * Component that allows users to search and replace elements in an image using the Stability AI API.
+ * Esimerkki prompt: husky standing on a beach with ocean waves
+ * Esimerkki search_prompt: background
+ * Toinen: golden retriever standing on a beach with ocean waves
+ */
 const StabilityAISearchReplace: React.FC = () => {
   const [image, setImage] = useState<File | null>(null);
   const [desiredOutput, setDesiredOutput] = useState("");
@@ -30,7 +28,6 @@ const StabilityAISearchReplace: React.FC = () => {
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [debugInfo, setDebugInfo] = useState<string>("");
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -38,16 +35,11 @@ const StabilityAISearchReplace: React.FC = () => {
     }
   };
 
-  const addDebugInfo = (info: string) => {
-    setDebugInfo((prev) => prev + info + "\n");
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setResult(null);
-    setDebugInfo("");
 
     if (!image || !desiredOutput || !replaceElement) {
       setError(
@@ -57,60 +49,18 @@ const StabilityAISearchReplace: React.FC = () => {
       return;
     }
 
-    addDebugInfo(`Image size: ${image.size} bytes`);
-    addDebugInfo(`Desired Output (prompt): ${desiredOutput}`);
-    addDebugInfo(`Replace Element (search_prompt): ${replaceElement}`);
-    addDebugInfo(`Output format: ${outputFormat}`);
-
     const formData = new FormData();
     formData.append("image", image);
     formData.append("prompt", desiredOutput);
     formData.append("search_prompt", replaceElement);
     formData.append("output_format", outputFormat);
 
-    try {
-      addDebugInfo("Sending request to API...");
-      const response = await axios.post(
-        "https://api.stability.ai/v2beta/stable-image/edit/search-and-replace",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_STABILITY_API_KEY}`,
-            Accept: "image/*",
-            "Content-Type": "multipart/form-data",
-          },
-          responseType: "arraybuffer",
-        },
-      );
+    const result = await searchAndReplaceAction(formData);
 
-      addDebugInfo(`Response status: ${response.status}`);
-      addDebugInfo(`Response size: ${response.data.byteLength} bytes`);
-
-      if (response.status === 200) {
-        const base64 = Buffer.from(response.data, "binary").toString("base64");
-        setResult(`data:image/${outputFormat};base64,${base64}`);
-        addDebugInfo("Image successfully processed and displayed");
-      } else {
-        throw new Error(
-          `${response.status}: ${Buffer.from(response.data).toString()}`,
-        );
-      }
-    } catch (error: any) {
-      console.error("Error:", error);
-      addDebugInfo(`Error occurred: ${error.message}`);
-      if (error.response) {
-        addDebugInfo(`Error status: ${error.response.status}`);
-        addDebugInfo(
-          `Error data: ${Buffer.from(error.response.data).toString()}`,
-        );
-        setError(
-          `Error ${error.response.status}: ${Buffer.from(error.response.data).toString()}`,
-        );
-      } else {
-        setError(
-          error.message || "An error occurred while processing the image.",
-        );
-      }
+    if (result.success) {
+      setResult(result.data ?? null);
+    } else {
+      setError(result.error);
     }
 
     setLoading(false);
@@ -177,12 +127,6 @@ const StabilityAISearchReplace: React.FC = () => {
           />
         </div>
       )}
-      <div className="mt-6">
-        <h3 className="text-lg font-semibold mb-2">Debug Info:</h3>
-        <pre className="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm">
-          {debugInfo}
-        </pre>
-      </div>
     </div>
   );
 };
