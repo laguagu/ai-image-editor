@@ -69,7 +69,6 @@ const StabilityAIInpaint: React.FC = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("handleSubmit");
     e.preventDefault();
     setLoading(true);
     setError(null);

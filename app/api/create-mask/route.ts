@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
   const buffer = await file.arrayBuffer();
   const newFormData = new FormData();
   newFormData.append("file", new Blob([buffer]), file.name);
+  console.log("fastapi url:", process.env.FASTAPI_URL);
 
   try {
     const response = await axios.post(

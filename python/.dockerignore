@@ -8,6 +8,7 @@ __pycache__/
 *.eggs/
 *.whl
 main.py
+mask_api_debug.py
 
 # Virtuaaliympäristöt
 venv/
