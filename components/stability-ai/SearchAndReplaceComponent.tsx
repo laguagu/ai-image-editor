@@ -16,14 +16,14 @@ import { Textarea } from "../ui/textarea";
 
 /**
  * Component that allows users to search and replace elements in an image using the Stability AI API.
- * Esimerkki prompt: husky standing on a beach with ocean waves
- * Esimerkki search_prompt: background
- * Toinen: golden retriever standing on a beach with ocean waves
+ * Default example:
+ * - Desired Output: "A dog of the Golden Retriever breed in a field"
+ * - Element to Replace: "Dog in middle of the picture"
  */
 const StabilityAISearchReplace: React.FC = () => {
   const [image, setImage] = useState<File | null>(null);
-  const [desiredOutput, setDesiredOutput] = useState("");
-  const [replaceElement, setReplaceElement] = useState("");
+  const [desiredOutput, setDesiredOutput] = useState("A dog of the Golden Retriever breed in a field");
+  const [replaceElement, setReplaceElement] = useState("Dog in middle of the picture");
   const [outputFormat, setOutputFormat] = useState("webp");
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -85,7 +85,7 @@ const StabilityAISearchReplace: React.FC = () => {
             id="desiredOutput"
             value={desiredOutput}
             onChange={(e) => setDesiredOutput(e.target.value)}
-            placeholder="e.g., golden retriever in a field"
+            placeholder="A dog of the Golden Retriever breed in a field"
             required
           />
         </div>
@@ -95,7 +95,7 @@ const StabilityAISearchReplace: React.FC = () => {
             id="replaceElement"
             value={replaceElement}
             onChange={(e) => setReplaceElement(e.target.value)}
-            placeholder="e.g., dog"
+            placeholder="Dog in middle of the picture"
             required
           />
         </div>
