@@ -1,12 +1,18 @@
 # AI Image Editor
 
-This project enables intelligent image editing using artificial intelligence powered by the Stability AI API. The application offers two powerful featu   - Create a `.env.local` file in the project root directory
-   - Add the following lines:
+This project enables intelligent image editing using artificial intelligence powered by the Stability AI API. The application offers two powerful features: **Background Modification** and **Search and Replace** functionality.
 
-     ```bash
-     NEXT_PUBLIC_STABILITY_API_KEY=your_stability_ai_api_key
-     FASTAPI_URL=http://localhost:8000/
-     ```*Background Modification** and **Search and Replace** functionality.
+## Setup and Configuration
+
+### Environment Variables
+
+- Create a `.env.local` file in the project root directory
+- Add the following lines:
+
+```bash
+NEXT_PUBLIC_STABILITY_API_KEY=your_stability_ai_api_key
+FASTAPI_URL=http://localhost:8000/
+```
 
 ## How It Works
 
@@ -173,7 +179,6 @@ background-remover/
    ```
 
 2. Set environment variables:
-
    - Create a `.env.local` file in the project root directory
    - Add the following lines:
      ```
@@ -188,7 +193,6 @@ background-remover/
    ```
 
 4. The application is now available at:
-
    - Frontend: `http://localhost:3000`
    - Backend: `http://localhost:8000`
 
