@@ -1,12 +1,13 @@
 import io
 import logging
 import os
+import platform
 import tempfile
 
 import numpy as np
 from fastapi import FastAPI, File, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from PIL import Image
 from rembg import new_session, remove
 
@@ -34,8 +35,11 @@ REMBG_SETTINGS = {
     "alpha_matting_erode_size": 10,
 }
 
-# Aseta U2NET_HOME ympäristömuuttuja
-os.environ['U2NET_HOME'] = '/tmp/.u2net'
+# Aseta U2NET_HOME ympäristömuuttuja (Windows-yhteensopiva)
+if platform.system() == "Windows":
+    os.environ['U2NET_HOME'] = os.path.join(tempfile.gettempdir(), '.u2net')
+else:
+    os.environ['U2NET_HOME'] = '/tmp/.u2net'
 
 # Luo uusi sessio rembg:lle
 session = new_session(
@@ -80,7 +84,22 @@ async def create_mask(request: Request, file: UploadFile = File(...)):
         with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as temp:
             mask_img.save(temp.name)
             logging.info("Mask saved as temporary file: %s", temp.name)
-            return FileResponse(temp.name, media_type="image/png", filename="mask.png")
+            
+            # Lue tiedosto ja poista se heti
+            with open(temp.name, 'rb') as f:
+                img_data = f.read()
+            
+            # Poista väliaikainen tiedosto
+            try:
+                os.unlink(temp.name)
+            except OSError:
+                logging.warning("Could not delete temporary file: %s", temp.name)
+            
+            return StreamingResponse(
+                io.BytesIO(img_data), 
+                media_type="image/png", 
+                headers={"Content-Disposition": "attachment; filename=mask.png"}
+            )
 
     except Exception as e:
         logging.error("Error processing file: %s", str(e), exc_info=True)

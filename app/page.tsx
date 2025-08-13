@@ -13,12 +13,12 @@ export default function Home() {
   return (
     <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8">
       <h1 className="text-4xl font-bold text-center mb-8">
-        Stability AI Image Editor
+        AI Image Editor
       </h1>
       <Tabs defaultValue="search-replace" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="search-replace">Search and Replace</TabsTrigger>
-          <TabsTrigger value="inpaint">Inpaint</TabsTrigger>
+          <TabsTrigger value="inpaint">Background Modification</TabsTrigger>
         </TabsList>
         <TabsContent value="search-replace">
           <Card>
@@ -36,9 +36,9 @@ export default function Home() {
         <TabsContent value="inpaint">
           <Card>
             <CardHeader>
-              <CardTitle>Inpaint Image</CardTitle>
+              <CardTitle>Background Modification</CardTitle>
               <CardDescription>
-                Intelligently edit and fill areas in your image
+                Replace or modify backgrounds in your images using AI
               </CardDescription>
             </CardHeader>
             <CardContent>

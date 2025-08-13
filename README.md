@@ -1,6 +1,12 @@
-# Image Editing with Artificial Intelligence
+# AI Image Editor
 
-This project enables image editing using artificial intelligence powered by the Stability AI API. The project has two main features: background modification and Search and Replace functionality.
+This project enables intelligent image editing using artificial intelligence powered by the Stability AI API. The application offers two powerful featu   - Create a `.env.local` file in the project root directory
+   - Add the following lines:
+
+     ```bash
+     NEXT_PUBLIC_STABILITY_API_KEY=your_stability_ai_api_key
+     FASTAPI_URL=http://localhost:8000/
+     ```*Background Modification** and **Search and Replace** functionality.
 
 ## How It Works
 
@@ -135,8 +141,8 @@ background-remover/
 
 4. Start the FastAPI server:
 
-   ```
-   uvicorn mask_api:app --reload
+   ```bash
+   python -m uvicorn mask_api:app --reload
    ```
 
    The server will start at `http://localhost:8000`.
@@ -145,13 +151,13 @@ background-remover/
 
 1. Install required npm packages in the project root directory:
 
-   ```
+   ```bash
    npm install
    ```
 
 2. Start the development server:
 
-   ```
+   ```bash
    npm run dev
    ```
 
@@ -161,19 +167,23 @@ background-remover/
 
 1. Clone the repository:
 
-   ```
-   git clone [repository-url]
+   ```bash
+   git clone https://github.com/laguagu/background-remover.git
    cd background-remover
    ```
 
 2. Set environment variables:
 
-   - Create a `.env` file in the project root directory
-   - Add the line: `NEXT_PUBLIC_STABILITY_API_KEY=your_api_key`
+   - Create a `.env.local` file in the project root directory
+   - Add the following lines:
+     ```
+     NEXT_PUBLIC_STABILITY_API_KEY=your_stability_ai_api_key
+     FASTAPI_URL=http://localhost:8000/
+     ```
 
 3. Build and start the containers:
 
-   ```
+   ```bash
    docker-compose up --build
    ```
 
@@ -183,7 +193,8 @@ background-remover/
    - Backend: `http://localhost:8000`
 
 5. To stop and remove the containers, use:
-   ```
+
+   ```bash
    docker-compose down
    ```
 
@@ -191,9 +202,10 @@ background-remover/
 
 Ensure you have set the following environment variables:
 
-- `NEXT_PUBLIC_STABILITY_API_KEY`: Stability AI API key
+- `NEXT_PUBLIC_STABILITY_API_KEY`: Your Stability AI API key
+- `FASTAPI_URL`: URL to the FastAPI backend (default: `http://localhost:8000/`)
 
-You can set these in a `.env` file in the project root directory.
+You can set these in a `.env.local` file in the project root directory.
 
 ## Things to Note
 

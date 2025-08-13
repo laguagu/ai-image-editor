@@ -2,6 +2,7 @@ import base64
 import io
 from typing import Optional
 
+import numpy as np
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -38,7 +39,7 @@ async def remove_background(
     file: UploadFile = File(...),
     alpha_matting: Optional[bool] = Form(False)
 ):
-    if not allowed_file(file.filename):
+    if not file.filename or not allowed_file(file.filename):
         raise HTTPException(
             status_code=400, detail="Tiedostomuoto ei ole tuettu. Tuetut muodot: PNG, JPG, JPEG, GIF, BMP")
 
@@ -46,13 +47,23 @@ async def remove_background(
         contents = await file.read()
         input_image = Image.open(io.BytesIO(contents))
 
-        output_image = remove(
-            input_image,
-            session=session,
-            alpha_matting=alpha_matting,
-            alpha_matting_foreground_threshold=ALPHA_MATTING_FOREGROUND_THRESHOLD if alpha_matting else None,
-            alpha_matting_background_threshold=ALPHA_MATTING_BACKGROUND_THRESHOLD if alpha_matting else None
-        )
+        if alpha_matting:
+            output_image = remove(
+                input_image,
+                session=session,
+                alpha_matting=True,
+                alpha_matting_foreground_threshold=ALPHA_MATTING_FOREGROUND_THRESHOLD,
+                alpha_matting_background_threshold=ALPHA_MATTING_BACKGROUND_THRESHOLD
+            )
+        else:
+            output_image = remove(input_image, session=session)
+
+        # Varmista että output_image on PIL Image
+        if not isinstance(output_image, Image.Image):
+            if isinstance(output_image, np.ndarray):
+                output_image = Image.fromarray(output_image)
+            else:
+                raise HTTPException(status_code=500, detail="Unexpected image format from rembg")
 
         img_byte_arr = io.BytesIO()
         output_image.save(img_byte_arr, format='PNG')
@@ -72,7 +83,7 @@ async def remove_background_base64(
     file: UploadFile = File(...),
     alpha_matting: Optional[bool] = Form(False)
 ):
-    if not allowed_file(file.filename):
+    if not file.filename or not allowed_file(file.filename):
         raise HTTPException(
             status_code=400, detail="Tiedostomuoto ei ole tuettu. Tuetut muodot: PNG, JPG, JPEG, GIF, BMP")
 
@@ -80,13 +91,23 @@ async def remove_background_base64(
         contents = await file.read()
         input_image = Image.open(io.BytesIO(contents))
 
-        output_image = remove(
-            input_image,
-            session=session,
-            alpha_matting=alpha_matting,
-            alpha_matting_foreground_threshold=ALPHA_MATTING_FOREGROUND_THRESHOLD if alpha_matting else None,
-            alpha_matting_background_threshold=ALPHA_MATTING_BACKGROUND_THRESHOLD if alpha_matting else None
-        )
+        if alpha_matting:
+            output_image = remove(
+                input_image,
+                session=session,
+                alpha_matting=True,
+                alpha_matting_foreground_threshold=ALPHA_MATTING_FOREGROUND_THRESHOLD,
+                alpha_matting_background_threshold=ALPHA_MATTING_BACKGROUND_THRESHOLD
+            )
+        else:
+            output_image = remove(input_image, session=session)
+
+        # Varmista että output_image on PIL Image
+        if not isinstance(output_image, Image.Image):
+            if isinstance(output_image, np.ndarray):
+                output_image = Image.fromarray(output_image)
+            else:
+                raise HTTPException(status_code=500, detail="Unexpected image format from rembg")
 
         buffered = io.BytesIO()
         output_image.save(buffered, format="PNG")
